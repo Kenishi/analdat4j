@@ -14,8 +14,8 @@ public class TrackerClient extends AbstractTrackerClient {
 		String storePath = props.getProperty("store.class", "ai.eve.stores.ConsoleStore");
 		try {
 			Constructor<LoggerInterface> storeConstructor = 
-					(Constructor<LoggerInterface>) TrackerClient.class.getClassLoader().loadClass(storePath).getConstructor();
-			this.loggerInterface = storeConstructor.newInstance();
+					(Constructor<LoggerInterface>) TrackerClient.class.getClassLoader().loadClass(storePath).getConstructor(Properties.class);
+			this.loggerInterface = storeConstructor.newInstance(props);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

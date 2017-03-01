@@ -1,10 +1,16 @@
 package ai.eve.stores;
 
+import java.util.Properties;
+
 import ai.eve.AbstractTrackerEvent;
 import ai.eve.LoggerInterface;
 import ai.eve.UserSession;
 
 public class ConsoleStore implements LoggerInterface {
+	
+	public ConsoleStore(Properties props) {
+		
+	}
 	
 	@Override
 	public void logEvent(AbstractTrackerEvent event) {
