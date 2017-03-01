@@ -52,6 +52,14 @@ task createPom << {
                     distribution 'repo'
                 }
             }
+            
+            repositories {
+            	repository {
+            		id 'project.local'
+            		name 'project'
+            		url 'file:${project.basedir}/repo'
+            	}
+            }
         }
     }.writeTo("pom.xml")
 }
