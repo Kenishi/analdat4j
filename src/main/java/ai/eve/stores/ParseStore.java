@@ -27,19 +27,19 @@ public class ParseStore implements LoggerInterface {
 	@Override
 	public void logEvent(AbstractTrackerEvent event) {
 		ParseObject obj = new ParseObject(this.table);
-		obj.add("eventName", event.getEventName());
-		obj.add("data", event.serializeData());
-		obj.add("timestamp", event.getTimestamp());
+		obj.put("eventName", event.getEventName());
+		obj.put("data", event.serializeData());
+		obj.put("timestamp", event.getTimestamp());
 		obj.saveInBackground();
 	}
 	
 	@Override
 	public void logEvent(UserSession user, AbstractTrackerEvent event) {
 		ParseObject obj = new ParseObject(this.table);
-		obj.add("userId", user.getUserId());
-		obj.add("eventName", event.getEventName());
-		obj.add("data", event.serializeData());
-		obj.add("timestamp", event.getTimestamp());
+		obj.put("userId", user.getUserId());
+		obj.put("eventName", event.getEventName());
+		obj.put("data", event.serializeData());
+		obj.put("timestamp", event.getTimestamp());
 		obj.saveInBackground();
 	}
 }
