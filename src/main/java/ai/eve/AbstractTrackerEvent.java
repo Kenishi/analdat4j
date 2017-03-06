@@ -29,6 +29,7 @@ public abstract class AbstractTrackerEvent {
 				.build();
 	}
 	
+	abstract public String getSource();
 	abstract public String getEventName();
 	abstract public String serializeData();
 }

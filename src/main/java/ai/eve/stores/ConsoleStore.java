@@ -26,6 +26,6 @@ public class ConsoleStore implements LoggerInterface {
 		String name = event.getEventName();
 		String data = event.serializeData();
 		
-		System.out.println("User: " + userId + " Tracker Event: " + name + " Data: " + data);
+		System.out.println("User: " + userId + " Tracker Event: " + name + " Source: " + event.getSource() + " Data: " + data);
 	}
 }
