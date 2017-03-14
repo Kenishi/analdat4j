@@ -12,6 +12,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
 
+version='1.0.7'
 targetCompatibility=1.8
 sourceCompatibility=1.8
 
@@ -47,7 +48,7 @@ task createPom << {
         project {
             groupId 'ai.eve'
             artifactId 'analdat4j'
-            version '1.0.2'
+            version version
 
             inceptionYear '2017'
             licenses {

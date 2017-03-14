@@ -8,18 +8,22 @@ import java.util.TimerTask;
 import java.util.Vector;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Logger;
 
+import org.json.JSONArray;
 import org.parse4j.Parse;
 import org.parse4j.ParseBatch;
 import org.parse4j.ParseException;
 import org.parse4j.ParseObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import ai.eve.AbstractTrackerEvent;
 import ai.eve.LoggerInterface;
 import ai.eve.UserSession;
 
 public class ParseStore implements LoggerInterface {
+	final static Logger logger = LoggerFactory.getLogger(ParseStore.class);
+	
 	private static Map<Properties, ParseStore> instances = new HashMap<>();
 	
 	private Properties props;
@@ -104,14 +108,14 @@ public class ParseStore implements LoggerInterface {
 				obj.put("data", m.event.serializeData());
 				obj.put("timestamp", m.event.getTimestamp());
 				batcher.createObject(obj);
-				
 				count++;
 				
 				if(count >= 49) {
 					try {
-						batcher.batch();
+						JSONArray array = batcher.batch();
+						logger.trace("Batch request finished. Result: {}", array.toString());
 					} catch (ParseException e) {
-						e.printStackTrace();
+						logger.error("Error batching request: {}", e);
 					}
 					count = 0;
 				}
