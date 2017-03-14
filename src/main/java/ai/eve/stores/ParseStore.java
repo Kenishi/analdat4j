@@ -29,7 +29,7 @@ public class ParseStore implements LoggerInterface {
 	private Vector<Message> messagesOut = new Vector<Message>();
 	private Timer timer;
 	
-	private ParseStore(Properties props) {
+	public ParseStore(Properties props) {
 		this.props = props;
 		
 		String endpoint = props.getProperty("store.parse.endpoint");
@@ -42,7 +42,7 @@ public class ParseStore implements LoggerInterface {
 		
 		// Setup the timer
 		TimerTask task = new DispatchTask(this);
-		this.timer = new Timer();
+		this.timer = new Timer("parseStoreDispatcher", true); // Is a Daemon thread
 		this.timer.scheduleAtFixedRate(task, 10000, 10000);
 		
 		// Setup shutdown hook to kill the timer

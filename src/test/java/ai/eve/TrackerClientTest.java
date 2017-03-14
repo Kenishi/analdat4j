@@ -32,11 +32,11 @@ public class TrackerClientTest {
 		Properties props = new Properties();
 		TestLogger logger = new TestLogger();
 		TrackerClient client = new TrackerClient(props, logger);
-		GenericTrackerEvent event = new GenericTrackerEvent("testEvent", "testData");
+		GenericTrackerEvent event = new GenericTrackerEvent("testEvent", "testData", "server");
 		client.trackEvent(event);
 		
 		// Test that non-user track logged
-		GenericTrackerEvent expected = new GenericTrackerEvent("testEvent", "testData");
+		GenericTrackerEvent expected = new GenericTrackerEvent("testEvent", "testData", "server");
 		expected.setTimestamp(event.getTimestamp());
 		
 		boolean result = events.stream()
@@ -44,10 +44,10 @@ public class TrackerClientTest {
 		assertTrue(result);
 		
 		UserSession session = new UserSession("myUserId");
-		event = new GenericTrackerEvent("testEvent2", "testData2");
+		event = new GenericTrackerEvent("testEvent2", "testData2", "server");
 		client.trackEvent(session, event);
 		
-		GenericTrackerEvent expected2 = new GenericTrackerEvent("testEvent2", "testData2");
+		GenericTrackerEvent expected2 = new GenericTrackerEvent("testEvent2", "testData2", "server");
 		expected2.setTimestamp(event.getTimestamp());
 		result = events.stream()
 				.anyMatch(ev -> (ev[0] != null && ev[0].equals(new UserSession("myUserId"))) && ev[1].equals(expected2));
