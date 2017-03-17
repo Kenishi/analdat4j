@@ -6,14 +6,13 @@ import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.json.JSONArray;
 import org.parse4j.Parse;
 import org.parse4j.ParseBatch;
 import org.parse4j.ParseException;
 import org.parse4j.ParseObject;
+import org.parse4j.ParseUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +22,8 @@ import ai.eve.UserSession;
 
 public class ParseStore implements LoggerInterface {
 	final static Logger logger = LoggerFactory.getLogger(ParseStore.class);
+	final static Integer BATCH_SIZE = Integer.valueOf(20);
+	final static Integer BATCH_TIME = Integer.valueOf(10000); // Milliseconds
 	
 	private static Map<Properties, ParseStore> instances = new HashMap<>();
 	
@@ -34,20 +35,21 @@ public class ParseStore implements LoggerInterface {
 	private Timer timer;
 	
 	public ParseStore(Properties props) {
+		logger.trace("Instantiating ParseStore");
 		this.props = props;
 		
 		String endpoint = props.getProperty("store.parse.endpoint");
 		String appId = props.getProperty("store.parse.appId");
-		String key = props.getProperty("store.parse.key");
+		String masterKey = props.getProperty("store.parse.master");
 		
-		Parse.initialize(appId, key, endpoint);
-		
+		Parse.initializeAsRoot(appId, masterKey, endpoint);
+				
 		this.table = props.getProperty("store.parse.table");
 		
 		// Setup the timer
 		TimerTask task = new DispatchTask(this);
 		this.timer = new Timer("parseStoreDispatcher", true); // Is a Daemon thread
-		this.timer.scheduleAtFixedRate(task, 10000, 10000);
+		this.timer.scheduleAtFixedRate(task, BATCH_TIME, BATCH_TIME);
 		
 		// Setup shutdown hook to kill the timer
 		Thread shutdownThread = new Thread(new ShutdownHandler(this.timer, this));
@@ -79,7 +81,7 @@ public class ParseStore implements LoggerInterface {
 	private static class DispatchTask extends TimerTask {
 		// Because Parse lib isn't built to work with multiple parse apps we'll use
 		// a lock to help avoid having multiple dispatches overwritting each other
-		private static Lock dispatchLock = new ReentrantLock();
+		// TODO: This doesn't work, need to add a call to make parse switch its initialization when we want to  use this instance
 		private ParseStore storeInst;
 		
 		public DispatchTask(ParseStore store) {
@@ -107,21 +109,38 @@ public class ParseStore implements LoggerInterface {
 				obj.put("source", m.event.getSource());
 				obj.put("data", m.event.serializeData());
 				obj.put("timestamp", m.event.getTimestamp());
-				batcher.createObject(obj);
-				count++;
-				
-				if(count >= 49) {
-					try {
-						JSONArray array = batcher.batch();
-						logger.trace("Batch request finished. Result: {}", array.toString());
-					} catch (ParseException e) {
-						logger.error("Error batching request: {}", e);
-					}
-					count = 0;
+
+				try {
+					obj.save();
+				} catch(Exception e) {
+					logger.error("Error creating object during ParseStore dispatch.", e);
 				}
+				
+//				batcher.createObject(obj);
+//				count++;
+//				
+//				if(count >= BATCH_SIZE) {
+//					dispatch(batcher);
+//					batcher = new ParseBatch();
+//					count = 0;
+//				}
 			}
+			
+//			 Dispatch any remaining messages
+//			if(count > 0) {
+//				dispatch(batcher);
+//			}
 		}
 		
+		private void dispatch(final ParseBatch batcher) {
+			try {
+				JSONArray array = batcher.batch();
+				logger.trace("Batch request finished. Result: {}", array.toString());
+			} catch (ParseException e) {
+				e.printStackTrace();
+				logger.error("Error batching request: {} {}", e.getMessage(), e.getStackTrace().toString());
+			}
+		}
 	}
 	
 	private class Message {
@@ -148,8 +167,7 @@ public class ParseStore implements LoggerInterface {
 			this.timer.cancel();
 			
 			// Run the dispatch task one more time to clear the dispatch queue
-			Thread thread = new Thread(new DispatchTask(this.store));
-			thread.start();
+			new DispatchTask(this.store).run();
 		}
 	}
 }

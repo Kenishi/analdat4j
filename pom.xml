@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>ai.eve</groupId>
+  <groupId>com.github.Kenishi</groupId>
   <artifactId>analdat4j</artifactId>
-  <version>1.0.7</version>
+  <version>1.0.8</version>
   <inceptionYear>2017</inceptionYear>
   <licenses>
     <license>
@@ -22,7 +22,7 @@
     <dependency>
       <groupId>com.github.Kenishi</groupId>
       <artifactId>parse4j</artifactId>
-      <version>1.5.3</version>
+      <version>1.5.4</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
@@ -43,6 +43,12 @@
       <version>2.3.0</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.spotify</groupId>
+      <artifactId>docker-client</artifactId>
+      <version>8.1.1</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <repositories>
     <repository>
@@ -50,6 +56,11 @@
       <url>https://jitpack.io</url>
     </repository>
   </repositories>
+  <properties>
+    <maven.test.skip>true</maven.test.skip>
+    <maven.test.failure.ignore>false</maven.test.failure.ignore>
+    <maven.test.error.ignore>false</maven.test.error.ignore>
+  </properties>
   <build>
     <plugins>
       <plugin>
