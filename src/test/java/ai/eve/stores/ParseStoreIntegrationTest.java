@@ -1,7 +1,5 @@
 package ai.eve.stores;
 
-import static org.junit.Assert.*;
-
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,9 +25,11 @@ import com.spotify.docker.client.messages.ContainerConfig;
 import com.spotify.docker.client.messages.ContainerCreation;
 import com.spotify.docker.client.messages.HostConfig;
 import com.spotify.docker.client.messages.Image;
-import com.spotify.docker.client.messages.ImageSearchResult;
 import com.spotify.docker.client.messages.PortBinding;
 import com.spotify.docker.client.messages.ProgressMessage;
+
+import ai.eve.GenericTrackerEvent;
+import ai.eve.TrackerClient;
 
 public class ParseStoreIntegrationTest {
 	final private static String DOCKER_URI = "https://192.168.99.100:2376";
@@ -40,6 +40,8 @@ public class ParseStoreIntegrationTest {
 	private static String appId = "mytestid";
 	private static String masterKey = "mymasterekey";
 	private static String restKey = "myrestkey";
+	
+	private TrackerClient client;
 	
 	@BeforeClass
 	public static void beforeAll() throws DockerCertificateException, DockerException, InterruptedException {
@@ -58,7 +60,9 @@ public class ParseStoreIntegrationTest {
 		props.setProperty("store.parse.appId", appId);
 		props.setProperty("store.parse.master", masterKey);
 		props.setProperty("store.parse.key", restKey);
-	}
+		props.setProperty("store.parse.endpoint", "http://192.168.99.100:1337/parse");
+		client = new TrackerClient(props);
+	};
 
 	@After
 	public void tearDown() throws Exception {
@@ -66,7 +70,7 @@ public class ParseStoreIntegrationTest {
 
 	@Test
 	public void testDispatch() throws InterruptedException {
-		
+		client.trackEvent(new GenericTrackerEvent("testevent", "data", "server"));
 	}
 	
 	private static void setupTempParseServer() throws DockerCertificateException, DockerException, InterruptedException {

@@ -12,7 +12,6 @@ import org.parse4j.Parse;
 import org.parse4j.ParseBatch;
 import org.parse4j.ParseException;
 import org.parse4j.ParseObject;
-import org.parse4j.ParseUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

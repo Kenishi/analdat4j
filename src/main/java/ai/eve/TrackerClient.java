@@ -6,6 +6,12 @@ import java.util.Properties;
 public class TrackerClient extends AbstractTrackerClient {
 	
 	private LoggerInterface loggerInterface;
+	private UserSession userSession;
+	
+	public TrackerClient(UserSession session, Properties props) {
+		this(props);
+		this.userSession = session;
+	}
 	
 	@SuppressWarnings("unchecked")
 	public TrackerClient(Properties props) {
@@ -36,6 +42,11 @@ public class TrackerClient extends AbstractTrackerClient {
 
 	@Override
 	public void trackEvent(AbstractTrackerEvent event) {
+		if(this.userSession != null) {
+			this.trackEvent(this.userSession, event);
+			return;
+		}
+		
 		if(loggerInterface != null) {
 			loggerInterface.logEvent(event);
 		}
